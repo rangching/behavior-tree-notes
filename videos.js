@@ -10,5 +10,20 @@ window.SERIES_TRAILER = "";  // 系列前導片 ID（延續型系列）
 
 window.VIDEO_LINKS = {
   u01: { youtube: "", mp4: "", duration: "9:47", sections: [0, 49.5, 114.8, 169.37, 244.5, 302.57, 363.27, 455.48, 547.0], noVoice: "", short: "" },
-  u02: { youtube: "", mp4: "", duration: "11:16", sections: [0, 45.47, 99.93, 209.4, 291.03, 388.33, 479.76, 624.15], noVoice: "", short: "" }
+  u02: { youtube: "", mp4: "", duration: "11:16", sections: [0, 45.47, 99.93, 209.4, 291.03, 388.33, 479.76, 624.15], noVoice: "", short: "" },
+  u03: { youtube: "", mp4: "", duration: "", sections: null, noVoice: "", short: "" },
+  u04: { youtube: "", mp4: "", duration: "", sections: null, noVoice: "", short: "" },
+  u05: { youtube: "", mp4: "", duration: "", sections: null, noVoice: "", short: "" },
+  u06: { youtube: "", mp4: "", duration: "", sections: null, noVoice: "", short: "" },
+  u07: { youtube: "", mp4: "", duration: "", sections: null, noVoice: "", short: "" },
+  u08: { youtube: "", mp4: "", duration: "", sections: null, noVoice: "", short: "" },
+  u09: { youtube: "", mp4: "", duration: "", sections: null, noVoice: "", short: "" },
+  u10: { youtube: "", mp4: "", duration: "", sections: null, noVoice: "", short: "" },
+  u11: { youtube: "", mp4: "", duration: "", sections: null, noVoice: "", short: "" },
+  u12: { youtube: "", mp4: "", duration: "", sections: null, noVoice: "", short: "" },
+  u13: { youtube: "", mp4: "", duration: "", sections: null, noVoice: "", short: "" },
+  u14: { youtube: "", mp4: "", duration: "", sections: null, noVoice: "", short: "" },
+  u15: { youtube: "", mp4: "", duration: "", sections: null, noVoice: "", short: "" },
+  u16: { youtube: "", mp4: "", duration: "", sections: null, noVoice: "", short: "" },
+  u17: { youtube: "", mp4: "", duration: "", sections: null, noVoice: "", short: "" }
 };

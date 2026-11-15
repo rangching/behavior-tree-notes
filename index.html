@@ -71,6 +71,21 @@ nav.main a.on{color:var(--bg);background:var(--accent)}
 .stage input[type=range]{flex:1;accent-color:var(--t)}
 .stage .ends{display:flex;justify-content:space-between;font-size:12px;color:var(--dim);margin-top:2px}
 .stage canvas{aspect-ratio:25/18}
+/* 原課程對照與路線總覽 */
+.srcline{font-size:12px;color:var(--dim);font-family:var(--f-mono)}
+.srcrow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px;font-size:13px}
+.rphase{margin-bottom:30px}
+.rlist{list-style:none;margin:0;padding:0;border-left:2px solid var(--line);margin-left:22px}
+.rrow{display:grid;grid-template-columns:auto 1fr 150px;gap:14px;align-items:start;padding:12px 0 12px 0;position:relative}
+.rrow+.rrow{border-top:1px solid var(--line)}
+.rdot{margin-left:-24px;font-family:var(--f-mono);font-size:12px;padding:2px 8px;border-radius:99px;background:var(--surface2);border:1px solid var(--line);color:var(--dim);white-space:nowrap}
+.rdot.live{background:var(--ok);border-color:var(--ok);color:var(--bg)}
+.rdot.done{border-color:var(--accent);color:var(--accent)}
+.rmain .dim{font-size:14px}
+.rside{display:flex;flex-direction:column;align-items:flex-end;gap:4px;font-size:12.5px}
+.rside .pbar{width:100%}
+.rstat.live{color:var(--ok)} .rstat.done{color:var(--accent)} .rstat.plan{color:var(--dim)}
+@media (max-width:640px){.rrow{grid-template-columns:auto 1fr}.rside{grid-column:2;align-items:flex-start}}
 .stage .ctrl{flex-wrap:wrap}
 .stage .ends{flex-wrap:wrap;gap:4px 12px;margin-top:8px}
 .stage .cap{min-height:4.8em;margin:10px 2px 0;font-size:13.5px;line-height:1.6;color:var(--dim)}
@@ -231,7 +246,8 @@ footer{border-top:1px solid var(--line);margin-top:40px;padding:22px 0 40px;colo
   .stats{grid-template-columns:1fr 1fr}
 }
 @media (max-width:520px){
-  nav.main a{padding:6px 8px}
+  nav.main a{padding:6px 6px;font-size:13px}
+  nav.main{gap:2px}
   .brand .long{display:none}
   .steps{grid-template-columns:1fr}
   .cmp{grid-template-columns:1fr}
@@ -248,6 +264,7 @@ footer{border-top:1px solid var(--line);margin-top:40px;padding:22px 0 40px;colo
     <a class="brand" id="brand" href="#home"></a>
     <nav class="main" id="nav">
       <a href="#home" data-nav="home">單元</a>
+      <a href="#route" data-nav="route">學習路線</a>
       <a href="#glossary" data-nav="glossary">術語表</a>
       <a href="#me" data-nav="me">我的學習</a>
     </nav>
@@ -308,8 +325,11 @@ function math(el) {
 function statusBadge(u) {
   if (hasVideo(u)) return `<span class="badge live">▶ 可觀看</span>`;
   if (u.status === "done") return `<span class="badge done">影片完成・連結待上架</span>`;
-  return `<span class="badge">製作中・連結預留</span>`;
+  return `<span class="badge">規劃中・可先看原課程</span>`;
 }
+/* ---------- 原課程對照（u.src：[{label, id}]） ---------- */
+const srcLinks = (u, cls = "btn small ghost") => (u.src || []).map(s => `<a class="${cls}" href="https://www.youtube.com/watch?v=${esc(s.id)}" target="_blank" rel="noopener">${esc(s.label)} ↗</a>`).join("");
+const srcText = u => (u.src || []).map(s => esc(s.label)).join("、");
 function unitCard(u) {
   const v = vid(u), p = progress(u);
   const img = v.yt ? `<img src="https://i.ytimg.com/vi/${v.yt}/hqdefault.jpg" alt="" loading="lazy">` : "";
@@ -319,6 +339,7 @@ function unitCard(u) {
       <div class="meta">EP${pad2(u.no)} · ${esc(u.tier.split("｜")[0])}</div>
       <h4>${esc(u.title)}</h4>
       <div class="tags">${esc(u.tags)}</div>
+      ${u.src ? `<div class="srcline">原課程：${srcText(u)}</div>` : ""}
       <div class="pbar" title="學習進度 ${p.pct}%"><i style="width:${p.pct}%"></i></div>
     </div></a>`;
 }
@@ -368,7 +389,7 @@ function viewHome() {
   </section>
 
   <section class="block">
-    <div class="sec-head"><h2>學習路線</h2><span class="dim" style="font-size:14px">全 ${UNITS.length} 集 · 已上架 ${ready} 集，其餘影片連結預留中</span></div>
+    <div class="sec-head"><h2>學習路線</h2><span class="dim" style="font-size:14px">全 ${UNITS.length} 集 · 已上架 ${ready} 集 · <a href="#route">路線總覽與原課程對照 →</a></span></div>
     ${phases}
   </section>`;
   math(app);
@@ -387,6 +408,7 @@ function viewUnit(u, tab) {
       <div class="tier">EP${pad2(u.no)} · ${esc(u.tier)}</div>
       <h1>${esc(u.title)}</h1>
       <p class="hook">${esc(u.hook)}</p>
+      ${u.src ? `<div class="srcrow"><span class="dim">對應 Ögren 原課程：</span>${srcLinks(u)}</div>` : ""}
     </div>
     <div class="prog">學習進度 ${p.pct}%${s.done ? ` · <span class="ok">已完成</span>` : ""}<div class="pbar"><i style="width:${p.pct}%"></i></div></div>
   </div>
@@ -439,8 +461,8 @@ function tabVideo(u) {
   if (v.yt) player = `<iframe id="ytFrame" src="https://www.youtube-nocookie.com/embed/${v.yt}?rel=0&playsinline=1" title="EP${pad2(u.no)} ${esc(u.title)}" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
   else if (v.mp4) player = `<video id="mp4" controls preload="metadata" src="${esc(v.mp4)}"></video>`;
   else player = `<div class="placeholder"><div class="ic">🎬</div><h3>影片連結預留</h3>
-      <p>${u.status === "done" ? "這一集已經完成剪輯，正在準備上架。" : "這一集正在製作中。"}上架後這裡會直接播放，右邊的${u.segWord}時間軸也能點擊跳轉。</p>
-      <code>videos.js → ${u.id}.youtube</code></div>`;
+      <p>${u.status === "done" ? "這一集已經完成剪輯，正在準備上架。" : "這一集還在規劃中，可以先看 Ögren 的英文原課程。"}上架後這裡會直接播放，右邊的${u.segWord}時間軸也能點擊跳轉。</p>
+      ${u.src ? `<div class="row" style="justify-content:center">${srcLinks(u, "btn small")}</div>` : `<code>videos.js → ${u.id}.youtube</code>`}</div>`;
   const list = u.sections.map((sec, i) => `<li><button ${live ? "" : "disabled"} data-act="seek" data-t="${times[i]}"><span class="ts">${fmt(times[i])}</span><span><span class="sl">${u.segWord} ${i + 1}／${N}</span>${esc(sec.title)}</span></button></li>`).join("");
   const links = [
     v.yt ? `<a class="btn small" href="https://www.youtube.com/watch?v=${v.yt}" target="_blank" rel="noopener">在 YouTube 開啟 ↗</a>` : "",
@@ -494,6 +516,30 @@ function tabQuiz(u, s) {
     ? `<div class="row" style="justify-content:space-between"><div><div class="score">${correct}／${u.quiz.length}</div><span class="dim">最佳紀錄 ${s.quizBest ?? correct}／${u.quiz.length}</span></div><button class="btn" data-act="quizReset">重做一次</button></div>`
     : `<span class="dim">已作答 ${answered}／${u.quiz.length}</span>`;
   return `<div class="card">${summary}</div><div class="card">${items}</div>`;
+}
+
+function viewRoute() {
+  const ready = UNITS.filter(hasVideo).length, made = UNITS.filter(u => u.status === "done").length;
+  const links = (SERIES.sourceLinks || []).map(l => `<a class="btn small" href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)} ↗</a>`).join("");
+  const dot = u => hasVideo(u) ? "live" : u.status === "done" ? "done" : "plan";
+  const dotLabel = { live: "可觀看", done: "影片完成", plan: "規劃中" };
+  const phases = SERIES.phases.map(ph => {
+    const us = UNITS.filter(u => u.phase === ph.id);
+    return `<div class="rphase">
+      <div class="phase-head"><h3>${esc(ph.name)}</h3><span class="rng">${ph.range}</span><p>${esc(ph.desc)}</p></div>
+      <ol class="rlist">${us.map(u => { const p = progress(u), d = dot(u); return `<li class="rrow">
+        <span class="rdot ${d}" title="${dotLabel[d]}">EP${pad2(u.no)}</span>
+        <div class="rmain"><a href="#${u.id}"><b>${esc(u.title)}</b></a><div class="dim">${esc(u.hook)}</div>
+          ${u.src ? `<div class="srcrow">${srcLinks(u)}</div>` : ""}</div>
+        <div class="rside"><span class="mono dim">${esc(vid(u).dur || "")}</span><span class="rstat ${d}">${dotLabel[d]}</span><div class="pbar" title="學習進度 ${p.pct}%"><i style="width:${p.pct}%"></i></div></div>
+      </li>`; }).join("")}</ol></div>`;
+  }).join("");
+  app.innerHTML = `
+  <div class="crumb"><a href="#home">首頁</a> / 學習路線</div>
+  <div class="sec-head"><h2>學習路線</h2><span class="dim" style="font-size:14px">全 ${UNITS.length} 集 · ${SERIES.phases.length} 個階段 · 影片完成 ${made} 集、已上架 ${ready} 集</span></div>
+  <p class="dim" style="margin-top:0">${esc(SERIES.routeIntro || "")}</p>
+  ${links ? `<div class="row" style="margin-bottom:22px">${links}</div>` : ""}
+  ${phases}`;
 }
 
 function viewGlossary(q = "") {
@@ -715,7 +761,8 @@ function route() {
     viewUnit(byId[a], tab);
     document.title = `EP${pad2(byId[a].no)} ${byId[a].title}｜${SERIES.short}`;
     if (!same) window.scrollTo(0, 0);
-  } else if (a === "glossary") { cur = { view: a }; viewGlossary(); document.title = `術語表｜${SERIES.short}`; window.scrollTo(0, 0); }
+  } else if (a === "route") { cur = { view: a }; viewRoute(); document.title = `學習路線｜${SERIES.short}`; window.scrollTo(0, 0); }
+  else if (a === "glossary") { cur = { view: a }; viewGlossary(); document.title = `術語表｜${SERIES.short}`; window.scrollTo(0, 0); }
   else if (a === "me") { cur = { view: a }; viewMe(); document.title = `我的學習｜${SERIES.short}`; window.scrollTo(0, 0); }
   else { cur = { view: "home" }; viewHome(); document.title = SERIES.short; window.scrollTo(0, 0); }
 }
